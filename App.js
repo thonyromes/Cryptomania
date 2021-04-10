@@ -4,6 +4,8 @@ import React from 'react';
 
 import { enableScreens } from 'react-native-screens';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { StatusBar } from 'expo-status-bar';
 
 import * as eva from '@eva-design/eva';
@@ -17,7 +19,9 @@ enableScreens();
 export default function App() {
   return (
     <ApplicationProvider {...eva} theme={eva.light}>
-      <Home />
+      <SafeAreaView style={{ flex: 1 }}>
+        <Home />
+      </SafeAreaView>
       {/* eslint-disable-next-line react/style-prop-object */}
       <StatusBar style="auto" />
     </ApplicationProvider>
