@@ -1,15 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { View } from 'react-native';
+
+import * as FileSystem from 'expo-file-system';
+
+import * as DocumentPicker from 'expo-document-picker';
 
 // prettier-ignore
 import {
   Layout, Card, Text, List, Button, Divider,
 } from '@ui-kitten/components';
 
-import api from '../api/index';
+import csvtojson from 'csvtojson';
 
-import coinListing from '../store/coinListing.json';
+// import api from '../api/index';
+
+// import coinListing from '../store/coinListing.json';
+
+const convertCsvToJSON = async (csvFile) => {
+  let convertedCsvToJson = null;
+  try {
+    // read csv file and convert to string
+    const csvString = await FileSystem.readAsStringAsync(csvFile);
+
+    // convert csv string to json
+    convertedCsvToJson = await csvtojson().fromString(csvString);
+  } catch (e) {
+    console.log(e);
+  }
+
+  return convertedCsvToJson;
+};
 
 // prettier-ignore
 const mergeCoins = (list) => list.reduce((acc, cur) => {
@@ -105,43 +126,78 @@ const renderItem = ({ index, item }) => (
   </View>
 );
 
-const ListEmpty = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Text appearance="hint" category="h6" style={{ marginBottom: 10 }}>
-      Nothing to see here
-    </Text>
-    <Button>Import CSV</Button>
-  </View>
-);
-
 export default function Home() {
   const [data, setData] = useState([]);
 
-  useEffect(() => {
-    // const sheetData = api.getSheetData(
-    //   'https://sheet.best/api/sheets/e02210d3-c486-495a-ad74-4c487ffebbf2',
-    // );
+  const [refreshing, setRefreshing] = useState(false);
 
-    // sheetData
-    //   .then((response) => setData(() => response.pageData.data))
-    //   .catch((error) => console.log(error));
-
-    const mergedCoins = mergeCoins(coinListing);
-
-    setData(() => mergedCoins);
+  const onRefresh = useCallback(() => {
+    setRefreshing((prevState) => !prevState);
   }, []);
 
-  console.log(data);
+  const onPickCsv = useCallback(() => {
+    (async () => {
+      try {
+        const doc = await DocumentPicker.getDocumentAsync();
+
+        if (doc.type === 'success') {
+          const convertedJSON = await convertCsvToJSON(doc.uri);
+
+          const mergedSimilarCoins = mergeCoins(convertedJSON);
+
+          setData(mergedSimilarCoins);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    })();
+  }, []);
+
+  // useEffect(() => {
+  // const sheetData = api.getSheetData(
+  //   'https://sheet.best/api/sheets/e02210d3-c486-495a-ad74-4c487ffebbf2',
+  // );
+
+  // sheetData
+  //   .then((response) => setData(() => response.pageData.data))
+  //   .catch((error) => console.log(error));
+
+  // const mergedCoins = mergeCoins(coinListing);
+
+  // setData(mergedCoins);
+  // }, []);
+
+  // console.log(data);
+
+  const renderEmptyList = useCallback(
+    () => (
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginTop: '75%',
+        }}
+      >
+        <Text appearance="hint" category="h6" style={{ marginBottom: 20 }}>
+          Nothing to see here
+        </Text>
+        <Button onPress={onPickCsv}>Import CSV</Button>
+      </View>
+    ),
+    [],
+  );
 
   return (
     <Layout level="1" style={{ flex: 1, position: 'relative' }}>
       <List
         contentContainerStyle={{ paddingTop: 40 }}
         data={data}
+        extraData={refreshing}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item, i) => item['purchase id']}
-        ListEmptyComponent={ListEmpty}
+        ListEmptyComponent={renderEmptyList}
       />
       {data.length > 0 && (
         <Layout
@@ -161,10 +217,17 @@ export default function Home() {
           }}
         >
           <View>
-            <Button size="tiny">Update</Button>
+            <Button size="tiny" onPress={onPickCsv}>
+              Import new
+            </Button>
           </View>
           <View>
-            <Button size="tiny">Refresh</Button>
+            <Button size="tiny">Import currency</Button>
+          </View>
+          <View>
+            <Button size="tiny" onPress={onRefresh}>
+              Refresh
+            </Button>
           </View>
         </Layout>
       )}
