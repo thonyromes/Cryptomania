@@ -1,0 +1,12 @@
+{
+  "name": "Cryptomania",
+  "displayName": "Cryptomania",
+  "expo": {
+    "name": "Cryptomania",
+    "slug": "Cryptomania",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
