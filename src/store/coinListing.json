@@ -1,0 +1,65 @@
+[
+  {
+    "purchase id": "1",
+    "coin/token": "ETH",
+    "unit": "0.27",
+    "total cost": "780",
+    "percentage_to_sell_at": "25"
+  },
+  {
+    "purchase id": "2",
+    "coin/token": "GAS",
+    "unit": "30",
+    "total cost": "455",
+    "percentage_to_sell_at": null
+  },
+  {
+    "purchase id": "3",
+    "coin/token": "VET",
+    "unit": "500",
+    "total cost": "45",
+    "percentage_to_sell_at": null
+  },
+  {
+    "purchase id": "4",
+    "coin/token": "GAS",
+    "unit": "10",
+    "total cost": "250",
+    "percentage_to_sell_at": "15"
+  },
+  {
+    "purchase id": "5",
+    "coin/token": "OXT",
+    "unit": "1000",
+    "total cost": "1200",
+    "percentage_to_sell_at": null
+  },
+  {
+    "purchase id": "6",
+    "coin/token": "ETH",
+    "unit": "0.5",
+    "total cost": "1000",
+    "percentage_to_sell_at": null
+  },
+  {
+    "purchase id": "7",
+    "coin/token": "BTC",
+    "unit": "1",
+    "total cost": "13000",
+    "percentage_to_sell_at": "50"
+  },
+  {
+    "purchase id": "8",
+    "coin/token": "DOT",
+    "unit": "4",
+    "total cost": "400",
+    "percentage_to_sell_at": "80"
+  },
+  {
+    "purchase id": "9",
+    "coin/token": "ADA",
+    "unit": "1000",
+    "total cost": "800",
+    "percentage_to_sell_at": null
+  }
+]
