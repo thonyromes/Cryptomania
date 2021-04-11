@@ -8,18 +8,33 @@ import HeaderComponent from './HeaderComponent';
 import FooterComponent from './FooterComponent';
 
 export default function CoinCard(props) {
-  const { data, marketPrices } = props;
+  const { data, marketPrices, currency } = props;
+
+  const baseCurrency = currency[0]?.purchasing_currency;
+  const altCurrency1 = currency[0]?.to_currency1;
+  const altCurrency2 = currency[0]?.to_currency2;
 
   // purchase statistics
   const unitBought = Number(data.unit);
   const totalCost = Number(data['total cost']);
 
   // market statistics
-  const unitPrice = marketPrices[data['coin/token']]?.CAD ?? 0;
-  const totalPrice = unitBought * Number(unitPrice);
+  const baseUnitPrice = marketPrices[data['coin/token']]
+    ? marketPrices[data['coin/token']][baseCurrency]
+    : null;
 
-  const percentChange = unitPrice
-    ? ((totalPrice - totalCost) / totalCost) * 100
+  const altUnitPrice1 = marketPrices[data['coin/token']]
+    ? marketPrices[data['coin/token']][altCurrency1]
+    : null;
+
+  const altUnitPrice2 = marketPrices[data['coin/token']]
+    ? marketPrices[data['coin/token']][altCurrency2]
+    : null;
+
+  const totalPrice = unitBought * Number(baseUnitPrice);
+
+  const percentChange = baseUnitPrice
+    ? (((totalPrice - totalCost) / totalCost) * 100).toPrecision(3)
     : 'unavailable';
 
   const CardHeader = (evaProps) => (
@@ -54,7 +69,7 @@ export default function CoinCard(props) {
             <Text category="s1" style={{ marginBottom: 10 }}>
               Total Cost
             </Text>
-            <Text category="p2">{`${data['total cost']} CAD`}</Text>
+            <Text category="p2">{`${data['total cost']} ${baseCurrency}`}</Text>
           </View>
         </View>
         <View style={{ flex: 1 }}>
@@ -63,8 +78,8 @@ export default function CoinCard(props) {
               Market Price
             </Text>
             <Text category="p2">
-              {marketPrices[data['coin/token']]?.CAD ?? 'Unavailable'}
-              {marketPrices[data['coin/token']]?.USD && ' CAD'}
+              {baseUnitPrice ?? 'Unavailable'}
+              {baseUnitPrice && ` ${baseCurrency}`}
             </Text>
           </View>
           <Divider style={{ marginVertical: 10 }} />
@@ -83,15 +98,15 @@ export default function CoinCard(props) {
                 category="p2"
                 style={{ lineHeight: 24, marginHorizontal: 5 }}
               >
-                {marketPrices[data['coin/token']]?.USD ?? 'Unavailable'}
-                {marketPrices[data['coin/token']]?.USD && ' USD'}
+                {altUnitPrice1 ?? 'Unavailable'}
+                {altUnitPrice1 && ` ${altCurrency1}`}
               </Text>
               <Text
                 category="p2"
                 style={{ lineHeight: 24, marginHorizontal: 5 }}
               >
-                {marketPrices[data['coin/token']]?.CNY ?? 'Unavailable'}
-                {marketPrices[data['coin/token']]?.USD && ' CNY'}
+                {altUnitPrice2 ?? 'Unavailable'}
+                {altUnitPrice2 && ` ${altCurrency2}`}
               </Text>
             </View>
           </View>
