@@ -12,6 +12,8 @@ import * as eva from '@eva-design/eva';
 
 import { ApplicationProvider } from '@ui-kitten/components';
 
+import Toast from 'react-native-toast-message';
+
 import Home from './src/screens/Home';
 
 enableScreens();
@@ -21,6 +23,7 @@ export default function App() {
     <ApplicationProvider {...eva} theme={eva.light}>
       <SafeAreaView style={{ flex: 1 }}>
         <Home />
+        <Toast ref={(ref) => Toast.setRef(ref)} topOffset={45} />
       </SafeAreaView>
       {/* eslint-disable-next-line react/style-prop-object */}
       <StatusBar style="auto" />

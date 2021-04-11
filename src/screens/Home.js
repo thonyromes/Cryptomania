@@ -9,6 +9,8 @@ import {
   Layout, Text, List, Button,
 } from '@ui-kitten/components';
 
+import Toast from 'react-native-toast-message';
+
 import CoinCard from '../components/CoinCard';
 
 import mergeCoins from '../utils/mergeCoins';
@@ -17,7 +19,7 @@ import convertCsvToJSON from '../utils/convertCsvToJSON';
 
 import validateCsvHeaders from '../utils/validateCsvHeaders';
 
-// import api from '../api/index';
+import api from '../api/index';
 
 const validCsvHeaders = [
   'purchase id',
@@ -27,20 +29,12 @@ const validCsvHeaders = [
   'percentage_to_sell_at',
 ];
 
-const renderItem = ({ index, item }) => (
-  <View style={{ paddingVertical: 5, paddingHorizontal: 15 }}>
-    <CoinCard data={item} />
-  </View>
-);
-
 export default function Home() {
   const [data, setData] = useState([]);
 
-  const [refreshing, setRefreshing] = useState(false);
+  const [marketPrices, setMarketPrices] = useState({});
 
-  const [error, setError] = useState({
-    csvHeaderError: null,
-  });
+  const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(() => {
     setRefreshing((prevState) => !prevState);
@@ -49,7 +43,9 @@ export default function Home() {
   const onPickCsv = useCallback(() => {
     (async () => {
       try {
-        const doc = await DocumentPicker.getDocumentAsync();
+        const doc = await DocumentPicker.getDocumentAsync({
+          type: 'text/csv',
+        });
 
         if (doc.type === 'success') {
           const convertedJSON = await convertCsvToJSON(doc.uri);
@@ -57,43 +53,56 @@ export default function Home() {
           const csvHeaders = validateCsvHeaders(convertedJSON, validCsvHeaders);
 
           if (!csvHeaders.valid) {
-            setError((prevState) => ({
-              ...prevState,
-              csvHeaderError: `Selected Csv header structure is not supported \n Expected: ${validCsvHeaders.join(
+            throw new Error(
+              `Selected Csv header structure is not supported\nExpected: ${validCsvHeaders.join(
                 ',',
-              )} \n Saw: ${csvHeaders.selected.join(',')}`,
-            }));
-
-            return;
+              )}\nSaw: ${csvHeaders.selected.join(',')}`,
+            );
           }
 
           const mergedSimilarCoins = mergeCoins(convertedJSON);
 
           setData(mergedSimilarCoins);
 
-          setError((prevState) => ({ ...prevState, csvHeaderError: null }));
+          Toast.show({
+            text1: 'Import Successful',
+            visibilityTime: 3000,
+          });
+        } else {
+          throw new Error('An error occurred during import');
         }
       } catch (e) {
-        console.log(e);
+        Toast.show({
+          type: 'error',
+          text1: 'Import Failed',
+          text2: e.toString(),
+          visibilityTime: 6000,
+        });
       }
     })();
   }, []);
 
-  // useEffect(() => {
-  // const sheetData = api.getSheetData(
-  //   'https://sheet.best/api/sheets/e02210d3-c486-495a-ad74-4c487ffebbf2',
-  // );
+  useEffect(() => {
+    const marketData = api.getMarketPrices(
+      'https://min-api.cryptocompare.com/data/pricemulti?fsyms=DOT,ADA&tsyms=USD,CNY,CAD',
+    );
 
-  // sheetData
-  //   .then((response) => setData(() => response.pageData.data))
-  //   .catch((error) => console.log(error));
+    // prettier-ignore
+    marketData
+      .then((response) => setMarketPrices(response.data))
+      .catch((e) => Toast.show({
+        type: 'error',
+        text1: 'An error occurred',
+        text2: e.toString(),
+        visibilityTime: 6000,
+      }));
+  }, []);
 
-  // const mergedCoins = mergeCoins(coinListing);
-
-  // setData(mergedCoins);
-  // }, []);
-
-  // console.log(data);
+  const renderItem = ({ index, item }) => (
+    <View style={{ paddingVertical: 5, paddingHorizontal: 15 }}>
+      <CoinCard data={item} marketPrices={marketPrices} />
+    </View>
+  );
 
   const renderEmptyList = useCallback(
     () => (

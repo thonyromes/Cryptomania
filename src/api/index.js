@@ -9,12 +9,11 @@ const instance = axios.create({
   },
 });
 
+// prettier-ignore
 export default {
-  getSheetData: async (url) => ({
-    pageData: await instance({
-      method: 'GET',
-      url,
-      params: {},
-    }),
+  getMarketPrices: async (url, params) => instance({
+    method: 'GET',
+    url,
+    params,
   }),
 };
