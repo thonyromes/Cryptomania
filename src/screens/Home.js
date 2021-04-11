@@ -1,4 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+// prettier-ignore
+import React, {
+  useState, useEffect, useCallback, useRef,
+} from 'react';
 
 import { View } from 'react-native';
 
@@ -72,7 +75,7 @@ export default function Home() {
       try {
         const convertedJSON = await importCsv(validCoinCsvHeaders);
 
-        if (!convertedJSON) return;
+        if (convertedJSON.length < 1) return;
 
         const mergedSimilarCoins = mergeCoins(convertedJSON);
 
@@ -94,7 +97,7 @@ export default function Home() {
       try {
         const convertedJSON = await importCsv(validCurrencyCsvHeaders);
 
-        if (!convertedJSON) return;
+        if (convertedJSON.length < 1) return;
 
         setCurrency(convertedJSON);
       } catch (e) {
@@ -123,7 +126,7 @@ export default function Home() {
       3000,
     );
 
-    return clearInterval(marketAutoRefresh);
+    return () => clearInterval(marketAutoRefresh);
   }, []);
 
   const renderItem = ({ index, item }) => (

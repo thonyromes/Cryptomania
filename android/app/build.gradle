@@ -134,7 +134,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.cryptomania"
+        applicationId "com.romes.cryptomania"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

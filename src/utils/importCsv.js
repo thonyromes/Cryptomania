@@ -13,27 +13,25 @@ const importCsv = async (validCsvHeaders) => {
       type: 'text/csv',
     });
 
-    if (doc.type !== 'success') {
-      throw new Error('An error occurred during import');
+    if (doc.type === 'success') {
+      convertedJSON = await convertCsvToJSON(doc.uri);
+
+      const csvHeaders = validateCsvHeaders(convertedJSON, validCsvHeaders);
+
+      if (!csvHeaders.valid) {
+        convertedJSON = [];
+        throw new Error(
+          `Selected Csv header structure is not supported\nExpected: ${validCsvHeaders.join(
+            ',',
+          )}\nSaw: ${csvHeaders.selected.join(',')}`,
+        );
+      }
+
+      Toast.show({
+        text1: `Imported: ${doc.name}`,
+        visibilityTime: 3000,
+      });
     }
-
-    convertedJSON = await convertCsvToJSON(doc.uri);
-
-    const csvHeaders = validateCsvHeaders(convertedJSON, validCsvHeaders);
-
-    if (!csvHeaders.valid) {
-      convertedJSON = [];
-      throw new Error(
-        `Selected Csv header structure is not supported\nExpected: ${validCsvHeaders.join(
-          ',',
-        )}\nSaw: ${csvHeaders.selected.join(',')}`,
-      );
-    }
-
-    Toast.show({
-      text1: `Imported: ${doc.name}`,
-      visibilityTime: 3000,
-    });
   } catch (e) {
     Toast.show({
       type: 'error',
