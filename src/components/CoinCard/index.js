@@ -2,27 +2,34 @@ import React from 'react';
 
 import { View } from 'react-native';
 
-// prettier-ignore
-import {
-  Card, Text, Button, Divider,
-} from '@ui-kitten/components';
+import { Card, Text, Divider } from '@ui-kitten/components';
+
+import HeaderComponent from './HeaderComponent';
+import FooterComponent from './FooterComponent';
 
 export default function CoinCard(props) {
   const { data, marketPrices } = props;
 
-  // console.log('market', marketPrices);
+  // purchase statistics
+  const unitBought = Number(data.unit);
+  const totalCost = Number(data['total cost']);
+
+  // market statistics
+  const unitPrice = marketPrices[data['coin/token']]?.CAD ?? 0;
+  const totalPrice = unitBought * Number(unitPrice);
+
+  const percentChange = unitPrice
+    ? ((totalPrice - totalCost) / totalCost) * 100
+    : 'unavailable';
 
   const CardHeader = (evaProps) => (
     <View {...evaProps}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Text category="s2">
-          {`@ Target ${
-            data.percentage_to_sell_at ? data.percentage_to_sell_at : 25
-          }%: `}
-        </Text>
-        <Text status="success" category="s1">
-          Yes
-        </Text>
+        <Text category="s2">@ Target %: </Text>
+        <HeaderComponent
+          percentChange={percentChange}
+          percentSellAt={data.percentage_to_sell_at || 25}
+        />
       </View>
     </View>
   );
@@ -30,16 +37,7 @@ export default function CoinCard(props) {
   const CardFooter = (evaProps) => (
     <View {...evaProps}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View style={{ flex: 1 }}>
-          <Text category="s1" status="success">
-            Up 25%
-          </Text>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Button size="tiny" status="success">
-            Sellable
-          </Button>
-        </View>
+        <FooterComponent percentChange={percentChange} />
       </View>
     </View>
   );
