@@ -12,7 +12,7 @@ import * as eva from '@eva-design/eva';
 
 import { ApplicationProvider } from '@ui-kitten/components';
 
-import Home from './src/components/Home';
+import Home from './src/screens/Home';
 
 enableScreens();
 
