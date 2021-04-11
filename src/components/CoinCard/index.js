@@ -91,7 +91,7 @@ export default function CoinCard(props) {
               style={{
                 flexDirection: 'row',
                 flexWrap: 'wrap',
-                justifyContent: 'space-between',
+                justifyContent: 'center',
               }}
             >
               <Text

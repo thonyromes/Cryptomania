@@ -106,6 +106,10 @@ export default function Home() {
   const onRefresh = useCallback(() => {
     (async () => {
       try {
+        Toast.show({
+          text1: 'Refreshing',
+          visibilityTime: 1000,
+        });
         await fetchMarketPrices(currentCoinCodes.current);
       } catch (e) {
         console.log(e);
@@ -113,24 +117,14 @@ export default function Home() {
     })();
   }, []);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const marketData = await api.getMarketPrices(
-  //         'https://min-api.cryptocompare.com/data/pricemulti?fsyms=DOT,ADA&tsyms=USD,CNY,CAD',
-  //       );
+  useEffect(() => {
+    const marketAutoRefresh = setInterval(
+      () => fetchMarketPrices(currentCoinCodes.current),
+      3000,
+    );
 
-  //       setMarketPrices(marketData.data);
-  //     } catch (e) {
-  //       Toast.show({
-  //         type: 'error',
-  //         text1: 'An error occurred',
-  //         text2: e.toString(),
-  //         visibilityTime: 6000,
-  //       });
-  //     }
-  //   })();
-  // }, []);
+    return clearInterval(marketAutoRefresh);
+  }, []);
 
   const renderItem = ({ index, item }) => (
     <View style={{ paddingVertical: 5, paddingHorizontal: 15 }}>
