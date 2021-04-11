@@ -15,7 +15,17 @@ import mergeCoins from '../utils/mergeCoins';
 
 import convertCsvToJSON from '../utils/convertCsvToJSON';
 
+import validateCsvHeaders from '../utils/validateCsvHeaders';
+
 // import api from '../api/index';
+
+const validCsvHeaders = [
+  'purchase id',
+  'coin/token',
+  'unit',
+  'total cost',
+  'percentage_to_sell_at',
+];
 
 const renderItem = ({ index, item }) => (
   <View style={{ paddingVertical: 5, paddingHorizontal: 15 }}>
@@ -27,6 +37,10 @@ export default function Home() {
   const [data, setData] = useState([]);
 
   const [refreshing, setRefreshing] = useState(false);
+
+  const [error, setError] = useState({
+    csvHeaderError: null,
+  });
 
   const onRefresh = useCallback(() => {
     setRefreshing((prevState) => !prevState);
@@ -40,9 +54,24 @@ export default function Home() {
         if (doc.type === 'success') {
           const convertedJSON = await convertCsvToJSON(doc.uri);
 
+          const csvHeaders = validateCsvHeaders(convertedJSON, validCsvHeaders);
+
+          if (!csvHeaders.valid) {
+            setError((prevState) => ({
+              ...prevState,
+              csvHeaderError: `Selected Csv header structure is not supported \n Expected: ${validCsvHeaders.join(
+                ',',
+              )} \n Saw: ${csvHeaders.selected.join(',')}`,
+            }));
+
+            return;
+          }
+
           const mergedSimilarCoins = mergeCoins(convertedJSON);
 
           setData(mergedSimilarCoins);
+
+          setError((prevState) => ({ ...prevState, csvHeaderError: null }));
         }
       } catch (e) {
         console.log(e);
