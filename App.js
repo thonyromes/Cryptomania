@@ -23,7 +23,7 @@ export default function App() {
     <ApplicationProvider {...eva} theme={eva.light}>
       <SafeAreaView style={{ flex: 1 }}>
         <Home />
-        <Toast ref={(ref) => Toast.setRef(ref)} topOffset={45} />
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </SafeAreaView>
       {/* eslint-disable-next-line react/style-prop-object */}
       <StatusBar style="auto" />

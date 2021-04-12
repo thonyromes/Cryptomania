@@ -9,11 +9,13 @@ import validateCsvHeaders from './validateCsvHeaders';
 const importCsv = async (validCsvHeaders) => {
   let convertedJSON = [];
   try {
-    const doc = await DocumentPicker.getDocumentAsync({
-      type: 'text/csv',
-    });
+    const doc = await DocumentPicker.getDocumentAsync();
 
     if (doc.type === 'success') {
+      if (!doc.name.endsWith('.csv')) {
+        throw new Error('Only Csv files are supported');
+      }
+
       convertedJSON = await convertCsvToJSON(doc.uri);
 
       const csvHeaders = validateCsvHeaders(convertedJSON, validCsvHeaders);
